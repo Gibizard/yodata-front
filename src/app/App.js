@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {CssBaseline, styled} from "@mui/material";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import AppHeader from "./AppHeader";
 import AppHeaderDivider from "./AppHeaderDivider";
 import {Route, Switch} from "react-router";
