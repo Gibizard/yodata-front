@@ -16,3 +16,14 @@ export const createUser = (users) => fetch("yodata/admin/users/add", {
     body: JSON.stringify(users)
 })
     .then(response => response.text())
+
+export function deleteUser(login) {
+    return fetch("yodata/admin/users/delete/" + login, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json;charset=UTF-8'
+        }
+    })
+        .then(response => response.text())
+}
