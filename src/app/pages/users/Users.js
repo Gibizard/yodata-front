@@ -95,20 +95,29 @@ export default function Users() {
             .catch(err => console.error(err))
     }, [usersChangedToggle])
 
-    function handleRowsModelChange() {
-        this.validationSchema = validationScheme;
-    }
-
-    function handleRowUpdate(row) {
-         updateUser(row);
-        //updateUser(super.state.users.find(user => user.login === row));
+    function handleCellChange(cell) {
+        if (cell.field === "password") {
+            let updatedUsers = users
+            let updatedUser = updatedUsers.find(user => user.login === cell.id)
+            updatedUser.password = cell.value
+            setUsers(updatedUsers)
+            updateUser(updatedUser)
+        } else if (cell.field === "role") {
+            if (cell.value === "USER" || cell.value === "ADMIN") {
+                let updatedUsers = users
+                let updatedUser = updatedUsers.find(user => user.login === cell.id)
+                updatedUser.role = cell.value
+                setUsers(updatedUsers)
+                updateUser(updatedUser)
+            }
+        }
         setUsersChangedToggle(!usersChangedToggle);
     }
 
     return (
         <>
-            <DataGrid editMode="row" columns={columns} rows={users} autoHeight={true} getRowId={row => row.login}
-                      onEditRowsModelChange={handleRowsModelChange} onRowEditCommit={handleRowUpdate}/>
+            <DataGrid editMode="cell" columns={columns} rows={users} autoHeight={true} getRowId={row => row.login}
+                      onCellEditCommit={handleCellChange}/>
             <br/>
             <Button variant="contained" color="secondary" onClick={handleDialogOpen}>Создать пользователя</Button>
             <Button variant="contained" color="primary" onClick={handleDeleteDialogOpen}>Удалить пользователя</Button>
