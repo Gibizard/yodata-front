@@ -14,4 +14,4 @@ export const clearParsingHistory = () => fetch("/yodata/admin/parsingResults/cle
         'Content-Type': 'application/json;charset=UTF-8'
     }
 })
-    .then(response => response.json())
+    .then(response => response.text())

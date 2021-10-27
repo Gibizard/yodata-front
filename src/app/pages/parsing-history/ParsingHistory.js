@@ -28,16 +28,19 @@ export default function ParsingHistory() {
             .catch(err => console.error(err))
     }, [parsingResultsChangedToggle])
 
-    function clear() {
+    const clear = () => {
         clearParsingHistory()
             .then(() => {
+                console.log(parsingResultsChangedToggle.valueOf());
                 setParsingResultsChangedToggle(!parsingResultsChangedToggle);
-            });
+                console.log(parsingResultsChangedToggle);
+            })
+            .catch(err => console.error(err));
     }
 
     return (
         <>
-            <DataGrid columns={columns} rows={history} autoHeight="true" getRowId={row => row.id}/>
+            <DataGrid columns={columns} rows={history} autoHeight={true} getRowId={row => row.id}/>
             <br/>
             <Button variant="contained" color="primary" onClick={clear}>Очистить историю парсинга</Button>
         </>

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {DataGrid} from "@mui/x-data-grid";
 import {useEffect, useState} from "react";
-import {createUser, deleteUser, getAllUsers} from "../../../api/userApi";
+import {createUser, deleteUser, getAllUsers, updateUser} from "../../../api/userApi";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from "@mui/material";
 import {useFormik} from "formik";
 import * as yup from "yup";
@@ -10,7 +10,9 @@ const columns = [
     {field: "login", headerName: "Логин", flex: 1},
     {field: "firstName", headerName: "Имя", flex: 1},
     {field: "lastName", headerName: "Фамилия", flex: 1},
-    {field: "telegramId", headerName: "Телеграм ID", flex: 1}
+    {field: "password", headerName: "Пароль", flex: 1, editable: true},
+    {field: "telegramId", headerName: "Телеграм ID", flex: 1},
+    {field: "role", headerName: "Роль", flex: 1, editable: true}
 ];
 
 const validationScheme = yup.object({
@@ -18,7 +20,8 @@ const validationScheme = yup.object({
     firstName: yup.string("Введите строку").required("Имя обязательно"),
     lastName: yup.string("Введите строку").required("Фамилия обязательна"),
     password: yup.string("Введите строку").required("Пароль обязателен"),
-    telegramId: yup.string("Введите строку").required("Telegram ID обязателен")
+    telegramId: yup.string("Введите строку").required("Telegram ID обязателен"),
+    role: yup.string("Введите строку").required("Роль обязательна").matches(/(USER|ADMIN)/)
 })
 
 const deleteUserValidationScheme = yup.object({
@@ -36,11 +39,12 @@ export default function Users() {
             firstName: "",
             lastName: "",
             telegramId: "",
-            password: ""
+            password: "",
+            role: ""
         },
         validationSchema: validationScheme,
-        onSubmit: values => {
-            createUser(values)
+        onSubmit: value => {
+            createUser(value)
                 .then(() => {
                     setDialogOpened(false);
                     setUsersChangedToggle(!usersChangedToggle);
@@ -91,9 +95,20 @@ export default function Users() {
             .catch(err => console.error(err))
     }, [usersChangedToggle])
 
+    function handleRowsModelChange() {
+        this.validationSchema = validationScheme;
+    }
+
+    function handleRowUpdate(row) {
+         updateUser(row);
+        //updateUser(super.state.users.find(user => user.login === row));
+        setUsersChangedToggle(!usersChangedToggle);
+    }
+
     return (
         <>
-            <DataGrid columns={columns} rows={users} autoHeight="true" getRowId={row => row.login}/>
+            <DataGrid editMode="row" columns={columns} rows={users} autoHeight={true} getRowId={row => row.login}
+                      onEditRowsModelChange={handleRowsModelChange} onRowEditCommit={handleRowUpdate}/>
             <br/>
             <Button variant="contained" color="secondary" onClick={handleDialogOpen}>Создать пользователя</Button>
             <Button variant="contained" color="primary" onClick={handleDeleteDialogOpen}>Удалить пользователя</Button>
@@ -152,6 +167,16 @@ export default function Users() {
                             onChange={createUserFormik.handleChange}
                             error={createUserFormik.touched.telegramId && Boolean(createUserFormik.errors.telegramId)}
                             helperText={createUserFormik.touched.telegramId && createUserFormik.errors.telegramId}
+                        />
+                        <TextField
+                            fullWidth
+                            name="role"
+                            label="Роль пользователя"
+                            placeholder="USER/ADMIN"
+                            value={createUserFormik.values.role}
+                            onChange={createUserFormik.handleChange}
+                            error={createUserFormik.touched.role && Boolean(createUserFormik.errors.role)}
+                            helperText={createUserFormik.touched.role && createUserFormik.errors.role}
                         />
                     </DialogContent>
                     <DialogActions>
